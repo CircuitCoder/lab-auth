@@ -1,0 +1,33 @@
+<%- include('includes/header.html', { active: 'login', title: '登陆' }) %>
+
+<main class="mdl-layout__content login-screen">
+<div class="mdl-card mdl-shadow--2dp">
+  <form method="POST" action="/admin/login">
+    <div class="mdl-card__title">
+      <h2 class="mdl-card__title-text">登陆</h2>
+    </div>
+    <div class="mdl-card__supporting-text">
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input class="mdl-textfield__input" type="text" id="user-input" name="user">
+        <label class="mdl-textfield__label" for="user-input">用户名</label>
+      </div>
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input class="mdl-textfield__input" type="password" id="pass-input" name="pass">
+        <label class="mdl-textfield__label" for="pass-input">密码</label>
+      </div>
+    </div>
+    <div class="mdl-card__actions mdl-card--border <%= failed ? 'login-failed' : ''%>">
+      <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" type="submit">
+        登陆
+      </button>
+      <% if(failed) { %>
+      <span class="mdl-color-text--red-500">
+        登陆失败!
+      </span>
+      <% } %>
+    </div>
+  </form>
+</div>
+</main>
+
+<%- include('includes/footer.html') %>

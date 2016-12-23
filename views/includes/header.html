@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue_grey-amber.min.css" />
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <style>
+      .login-failed {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .login-failed > span {
+        padding-right: 16px;
+        font-size: 14px;
+      }
+      .mdl-layout {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+      }
+      .login-screen {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .table-screen {
+        padding: 100px 0;
+      }
+      .table-screen table {
+        margin: 0 auto;
+      }
+      table .mdl-textfield {
+        width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
+      <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">THSCSLab Auth</span>
+        <nav class="mdl-navigation">
+          <a class="mdl-navigation__link <% if(active === 'log') { %>active<% } %>" href="/log/everyone/all">记录</a>
+          <a class="mdl-navigation__link <% if(active === 'user') { %>active<% } %>" href="/user">用户</a>
+          <a class="mdl-navigation__link" href="/admin/logout">登陆 / 登出</a>
+        </nav>
+      </div>
