@@ -1,11 +1,17 @@
 <%- include('includes/header.html', { active: 'user', title: '用户' }) %>
 
 <main class="mdl-layout__content table-screen">
+<script>
+function update(user) {
+  var pv = document.getElementById('pass-' + user).value;
+  document.getElementById('btn-' + user).innerHTML = pv ? '更新' : '删除';
+}
+</script>
 <table class="mdl-data-table mdl-shadow--2dp">
   <thead>
     <tr>
       <th class="mdl-data-table__cell--non-numeric">用户名</th>
-      <th class="mdl-data-table__cell--non-numeric">密码 ( 留空以删除用户 )</th>
+      <th class="mdl-data-table__cell--non-numeric">新密码</th>
       <th class="mdl-data-table__cell--non-numeric">更新</th>
     </tr>
   </thead>
@@ -16,13 +22,13 @@
         <td class="mdl-data-table__cell--non-numeric"><%= u %></td>
         <td class="mdl-data-table__cell--non-numeric">
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input class="mdl-textfield__input" type="password" id="pass-<%= u %>" name="pass">
+            <input class="mdl-textfield__input" type="password" id="pass-<%= u %>" name="pass" oninput="update('<%= u %>')">
             <label class="mdl-textfield__label" for="sample3">新密码</label>
           </div>
         </td>
         <td class="mdl-data-table__cell--non-numeric">
-          <button class="mdl-button mdl-js-button mdl-js-ripple-effect" type="submit">
-            提交
+          <button class="mdl-button mdl-js-button mdl-js-ripple-effect" type="submit" id="btn-<%= u %>">
+            删除
           </button>
         </td>
       </form>
