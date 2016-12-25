@@ -5,6 +5,9 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue_grey-amber.min.css" />
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/flatpickr.min.css">
+    <script src="https://unpkg.com/flatpickr"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
     <style>
       .login-failed {
         display: flex;
@@ -43,7 +46,7 @@
       <div class="mdl-layout__drawer">
         <span class="mdl-layout-title">THSCSLab Auth</span>
         <nav class="mdl-navigation">
-          <a class="mdl-navigation__link <% if(active === 'log') { %>active<% } %>" href="/log/everyone/all">记录</a>
+          <a class="mdl-navigation__link <% if(active === 'log') { %>active<% } %>" href="/log/everyone/begin/now">记录</a>
           <a class="mdl-navigation__link <% if(active === 'user') { %>active<% } %>" href="/user">用户</a>
           <a class="mdl-navigation__link" href="/admin/logout">登陆 / 登出</a>
         </nav>

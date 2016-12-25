@@ -1,0 +1,86 @@
+<%- include('includes/header.html', { active: 'user', title: '用户' }) %>
+
+<main class="mdl-layout__content table-screen">
+<script>
+function reroute() {
+  var uv = document.getElementById('user-input').value;
+  var sv = document.getElementById('since-input').value;
+  var tv = document.getElementById('till-input').value;
+
+  sv = sv ? moment(sv).utc().format() : 'begin';
+  tv = tv ? moment(tv).utc().format() : 'now';
+  if(!uv) uv = 'everyone';
+
+  window.location.pathname = '/log/' + uv + '/' + sv + '/' + tv;
+}
+</script>
+<style>
+.log-manip {
+  width: 100%;
+  margin-bottom: 50px;
+}
+
+.log-manip > div, .log-manip > button {
+  display: block;
+  margin: 0 auto;
+}
+</style>
+<div class="log-manip">
+  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+    <input class="mdl-textfield__input" type="text" id="user-input" placeholder="所有人" value="<%= user %>">
+    <label class="mdl-textfield__label" for="user-input">用户</label>
+  </div>
+  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+    <input class="mdl-textfield__input" type="text" id="since-input" placeholder="开始">
+    <label class="mdl-textfield__label" for="since-input">从</label>
+  </div>
+  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+    <input class="mdl-textfield__input" type="text" id="till-input" placeholder="现在">
+    <label class="mdl-textfield__label" for="till-input">到</label>
+  </div>
+  <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="reroute()">
+    显示
+  </button>
+</div>
+<script>
+flatpickr('#since-input', {
+  enableTime: true,
+  time_24hr: true,
+  <% if(since !== 'begin') { %>defaultDate: '<%= since %>' <% } %>
+});
+
+flatpickr('#till-input', {
+  enableTime: true,
+  time_24hr: true,
+  <% if(till !== 'now') { %>defaultDate: '<%= till %>' <% } %>
+});
+</script>
+<table class="mdl-data-table mdl-shadow--2dp">
+  <thead>
+    <tr>
+      <th class="mdl-data-table__cell--non-numeric">时间</th>
+      <th class="mdl-data-table__cell--non-numeric">用户名</th>
+      <th class="mdl-data-table__cell--non-numeric">状态</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for(const u of entries) { %>
+    <tr>
+      <td class="mdl-data-table__cell--non-numeric"><%= u.formattedTime %></td>
+      <td class="mdl-data-table__cell--non-numeric"><%= u.user %></td>
+      <% if(u.result.success) { %>
+      <td class="mdl-data-table__cell--non-numeric" style="color: rgba(0,75,0, 0.7)">
+        成功
+      </td>
+      <% } else { %>
+      <td class="mdl-data-table__cell--non-numeric" style="color: rgba(180, 0, 0, 0.7)">
+        <%= u.result.error %>
+      </td>
+      <% } %>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+</main>
+
+<%- include('includes/footer.html') %>

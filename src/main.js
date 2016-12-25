@@ -22,8 +22,8 @@ const router = new koaRouter();
 mkdirp(path.resolve(__dirname, '../db/user/'));
 mkdirp(path.resolve(__dirname, '../db/log/'));
 
-const userdb = levelup(path.resolve(__dirname, '../db/user/'));
-const logdb = levelup(path.resolve(__dirname, '../db/log/'));
+const userdb = levelup(path.resolve(__dirname, '../db/user/'), { valueEncoding: 'json' });
+const logdb = levelup(path.resolve(__dirname, '../db/log/'), { valueEncoding: 'json' });
 levelPromise(userdb);
 levelPromise(logdb);
 
@@ -62,8 +62,8 @@ function genPassHash(user, pass) {
 router.post('/auth', async (ctx, next) => {
   const resp = await next();
   const curTime = moment().utc().format();
-  // logdb.put(`everyone-${curTime}-${crypto.randomBytes(24).toString('hex')}`, { user: ctx.request.body.user, result: resp, time: curTime });
-  // logdb.put(`${ctx.request.body.user}-${curTime}-${crypto.randomBytes(24).toString('hex')}`, { user: ctx.request.body.user, result: resp, time: curTime });
+  logdb.put(`everyone-${curTime}-${crypto.randomBytes(24).toString('hex')}`, { user: ctx.request.body.user, result: resp, time: curTime });
+  logdb.put(`${ctx.request.body.user}-${curTime}-${crypto.randomBytes(24).toString('hex')}`, { user: ctx.request.body.user, result: resp, time: curTime });
 }, async ctx => {
   if(!ctx.request.body.user) return ctx.body = { success: false, error: 'invalid_credentials' };
   if(!ctx.request.body.pass) return ctx.body = { success: false, error: 'invalid_credentials' };
@@ -84,11 +84,11 @@ const adminAuth = async (ctx, next) => {
 
 router.post('/admin/login', async ctx => {
   if(ctx.session.admin)
-    return ctx.redirect('/log/everyone/all');
+    return ctx.redirect('/log/everyone/begin/now');
   if(ctx.request.body.user === config.admin.user
     && ctx.request.body.pass === config.admin.pass) {
     ctx.session.admin = true;
-    return ctx.redirect('/log/everyone/all');
+    return ctx.redirect('/log/everyone/begin/now');
   }
 
   ctx.body = await loginRenderer({ failed: true });
@@ -145,7 +145,35 @@ router.post('/user/:id', adminAuth, async ctx => {
   }
 });
 
-router.get('/log/:user/:since', adminAuth, async ctx => {
+router.get('/log/:user/:since/:till', adminAuth, async ctx => {
+  const sinceTime = ctx.params.since === 'begin' ? moment(0) : moment.parseZone(ctx.params.since).utc();
+  const tillTime = ctx.params.till === 'now' ? moment.utc() : moment.parseZone(ctx.params.till).utc();
+  const entries = await new Promise((resolve, reject) => {
+    const total = [];
+    logdb.createValueStream({
+      limit: config.logLen,
+      gte: ctx.params.user + '-' + sinceTime.format(),
+      lte: ctx.params.user + '-' + tillTime.format(),
+      reverse: true,
+    })
+    .on('data', data => total.push(data))
+    .on('error', err => reject(err))
+    .on('end', () => resolve(total));
+  });
+
+  for(const e of entries)
+    e.formattedTime = moment.parseZone(e.time).local().format('YYYY-MM-DD HH:mm:ss Z');
+
+  ctx.body = await logRenderer({
+    entries,
+    user: ctx.params.user,
+    since: ctx.params.since,
+    till: ctx.params.till,
+  });
+});
+
+router.get('/', async ctx => {
+  return ctx.redirect('/log/everyone/begin/now');
 });
 
 app.keys = [config.secret];
