@@ -24,10 +24,15 @@ function reroute() {
   display: block;
   margin: 0 auto;
 }
+
+.table-hint {
+  opacity: 0.3;
+  font-style: italic;
+}
 </style>
 <div class="log-manip">
   <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-    <input class="mdl-textfield__input" type="text" id="user-input" placeholder="所有人" value="<%= user %>">
+    <input class="mdl-textfield__input" type="text" id="user-input" placeholder="所有人" value="<%= user === 'everyone' ? '' : user %>">
     <label class="mdl-textfield__label" for="user-input">用户</label>
   </div>
   <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -77,6 +82,20 @@ flatpickr('#till-input', {
         <%= u.result.error %>
       </td>
       <% } %>
+    </tr>
+    <% } %>
+    <% if(entries.length === 0) { %>
+    <tr>
+      <td class="mdl-data-table__cell--non-numeric table-hint">无记录</td>
+      <td class="mdl-data-table__cell--non-numeric"></td>
+      <td class="mdl-data-table__cell--non-numeric"></td>
+    </tr>
+    <% } %>
+    <% if(hasNext) { %>
+    <tr>
+      <td class="mdl-data-table__cell--non-numeric table-hint">还有更多记录</td>
+      <td class="mdl-data-table__cell--non-numeric"></td>
+      <td class="mdl-data-table__cell--non-numeric"></td>
     </tr>
     <% } %>
   </tbody>

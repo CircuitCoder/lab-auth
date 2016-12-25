@@ -148,17 +148,20 @@ router.post('/user/:id', adminAuth, async ctx => {
 router.get('/log/:user/:since/:till', adminAuth, async ctx => {
   const sinceTime = ctx.params.since === 'begin' ? moment(0) : moment.parseZone(ctx.params.since).utc();
   const tillTime = ctx.params.till === 'now' ? moment.utc() : moment.parseZone(ctx.params.till).utc();
-  const entries = await new Promise((resolve, reject) => {
+  const [entries, hasNext] = await new Promise((resolve, reject) => {
     const total = [];
     logdb.createValueStream({
-      limit: config.logLen,
+      limit: config.logLen + 1,
       gte: ctx.params.user + '-' + sinceTime.format(),
       lte: ctx.params.user + '-' + tillTime.format(),
       reverse: true,
     })
     .on('data', data => total.push(data))
     .on('error', err => reject(err))
-    .on('end', () => resolve(total));
+    .on('end', () => {
+      const hasNext = total.length > config.logLen;
+      resolve([total.slice(0, config.logLen), hasNext]);
+    });
   });
 
   for(const e of entries)
@@ -166,6 +169,7 @@ router.get('/log/:user/:since/:till', adminAuth, async ctx => {
 
   ctx.body = await logRenderer({
     entries,
+    hasNext,
     user: ctx.params.user,
     since: ctx.params.since,
     till: ctx.params.till,
